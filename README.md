@@ -46,3 +46,8 @@ jobs:
 - no support for pre_releases
 - no automatic semantic versioning
 
+## what does it look like
+
+- runs: [link](https://github.com/sbe-arg/simple-tags-and-releases/actions/workflows/simple.yml)
+- releases: [link](https://github.com/sbe-arg/simple-tags-and-releases/releases)
+- tags: [link](https://github.com/sbe-arg/simple-tags-and-releases/tags)
