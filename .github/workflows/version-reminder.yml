@@ -1,0 +1,58 @@
+name: version-reminder
+
+on:
+  pull_request:
+    types:
+      - opened
+
+concurrency:
+  group: ${{ github.repository }}/${{ github.workflow }}/${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  version-reminder:
+    name: Version reminder
+    runs-on: ubuntu-22.04
+    timeout-minutes: 1
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: version-check
+        id: version_check
+        if: hashFiles('VERSION')
+        run: |
+          VERSION_FILE="VERSION"
+          setOutput() {
+            echo "${1}=${2}" >> "${GITHUB_OUTPUT}"
+          }
+          git fetch origin main
+          if ! git diff --unified=0 origin/main.. -- $VERSION_FILE | grep '^[+-]' | grep -i "version" >/dev/null
+          then
+            echo "remind bumping"
+            setOutput "remind" 'true'
+          else
+            echo "version is being BUMPED $(cat $VERSION_FILE)"
+            setOutput "remind" 'false'
+          fi
+
+      - name: version-reminder-comment
+        if: hashFiles('VERSION') && steps.version_check.outputs.remind == 'true'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const backtick = '`';
+            const body = `
+            ### :bulb: **Don't forget to bump the VERSION file**
+
+            By bumping the version in ${backtick}VERSION${backtick} file, we trigger a repo TAG and repo RELEASE, else nothing happens.
+            `.trim();
+
+            github.rest.issues.createComment({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

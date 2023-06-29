@@ -1,0 +1,39 @@
+name: version-check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+    branches:
+      - main
+    paths:
+      - 'VERSION'
+
+concurrency:
+  group: ${{ github.repository }}/${{ github.workflow }}/${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  version-check:
+    name: Version check
+    runs-on: ubuntu-22.04
+    timeout-minutes: 1
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: version-check
+        if: hashFiles('VERSION')
+        run: |
+          VERSION_FILE="VERSION"
+          git fetch origin main
+          if ! git diff --unified=0 origin/main.. -- $VERSION_FILE | grep '^[+-]' | grep -i "version" >/dev/null
+          then
+            echo "::error::Bump the version and update your branch."
+            exit 1
+          else
+            echo "version-check PASSED $(cat $VERSION_FILE)"
+          fi
