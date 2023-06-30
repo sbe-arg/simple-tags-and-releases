@@ -1,5 +1,7 @@
 # simple-tags-and-releases
 
+[![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/7521/badge)](https://bestpractices.coreinfrastructure.org/projects/7521)
+
 ## USAGE
 
 ```yaml
