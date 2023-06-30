@@ -5,7 +5,8 @@ on:
     types:
       - opened
 
-permissions: read-all
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.repository }}/${{ github.workflow }}/${{ github.ref }}
