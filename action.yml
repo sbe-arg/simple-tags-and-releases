@@ -52,6 +52,6 @@ runs:
         fi
 
         # Upload files
-        if [ $upload ]; then
+        if [ -n "$upload" ]; then
           gh release upload $version $upload
         fi
